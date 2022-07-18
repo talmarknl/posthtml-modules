@@ -52,13 +52,13 @@ function parseLocals({options, node}, optionLocals, attributeLocals) {
 * @return {Promise<String>} [Promise with file content's]
 */
 function readFile(options, href) {
-  var filePath = path.join(path.isAbsolute(href) ? options.root_skin : path.dirname(options.from), href);
-
-  if (fs.existsSync(filePath) === false) { 
-    var filePath = path.join(path.isAbsolute(href) ? options.root : path.dirname(options.from), href);
-  } 
   return new Promise((resolve, reject) => {
-    fs.readFile(filePath, 'utf8', (error, response) => error ? reject(error) : resolve(response));
+    Array.from(options.roots).forEach(root => {
+      var filePath = path.join(path.isAbsolute(href) ? root : path.dirname(options.from), href);
+      if (fs.existsSync(filePath)) { 
+        fs.readFile(filePath, 'utf8', (error, response) => error ? reject(error) : resolve(response));
+      } 
+    });
   });
 }
 
@@ -139,7 +139,7 @@ module.exports = (options = {}) => {
   options.plugins = options.plugins || [];
   options.initial = options.initial || false;
   options.attribute = options.attribute || 'href';
-  options.root = path.resolve(options.root || './');
+  options.roots = options.roots || {};
   options.attributeAsLocals = options.attributeAsLocals || false;
   options.expressions = options.expressions || {};
 
