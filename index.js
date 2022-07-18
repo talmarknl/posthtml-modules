@@ -52,8 +52,11 @@ function parseLocals({options, node}, optionLocals, attributeLocals) {
 * @return {Promise<String>} [Promise with file content's]
 */
 function readFile(options, href) {
-  const filePath = path.join(path.isAbsolute(href) ? options.root : path.dirname(options.from), href);
+  var filePath = path.join(path.isAbsolute(href) ? options.root_skin : path.dirname(options.from), href);
 
+  if (fs.existsSync(filePath) === false) { 
+    var filePath = path.join(path.isAbsolute(href) ? options.root : path.dirname(options.from), href);
+  } 
   return new Promise((resolve, reject) => {
     fs.readFile(filePath, 'utf8', (error, response) => error ? reject(error) : resolve(response));
   });
