@@ -62,6 +62,7 @@ function readFile(options, href) {
       } 
     });
     if (!fileExists){
+      console.log('File not found: ' + href);
       resolve('File not found: ' + href ); 
     }
   });
