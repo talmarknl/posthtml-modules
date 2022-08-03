@@ -45,27 +45,31 @@ function parseLocals({options, node}, optionLocals, attributeLocals) {
   }
 }
 
+ function isCorrectFilePath(roots, href) {
+  for (let root of roots) {
+    var filePath = path.join(path.isAbsolute(href) ? root : path.dirname(options.from), href);
+    if (fs.existsSync(filePath)) {
+        return filePath;
+    } 
+  }
+  return '';
+}
+
 /**
 * readFile
 * @param  {Object} options  [plugin options object]
 * @param  {String} href     [node's href attribute value]
 * @return {Promise<String>} [Promise with file content's]
 */
-function readFile(options, href) {
-  return new Promise((resolve, reject) => {
-    var fileExists = false;
-    Array.from(options.roots).reverse().forEach(root => {
-      var filePath = path.join(path.isAbsolute(href) ? root : path.dirname(options.from), href);
-      if (fs.existsSync(filePath)) { 
-        fileExists = true;
-        fs.readFile(filePath, 'utf8', (error, response) => error ? reject(error) : resolve(response));
-      } 
-    });
-    if (!fileExists){
-      console.log('File not found: ' + href);
-      resolve('File not found: ' + href ); 
-    }
-  });
+ function readFile(options, href) {
+  let roots = Array.from(options.roots).reverse();
+  var filePath = isCorrectFilePath(roots,href);
+  console.log(filePath);
+    // return new Promise((resolve, reject) => {
+    //   let roots = Array.from(options.roots).reverse();
+    //   var filePath = isCorrectFilePath(roots,href);
+    //   fs.readFile(filePath, 'utf8', (error, response) => error ? reject(error) : resolve(response));
+    // });
 }
 
 /**
