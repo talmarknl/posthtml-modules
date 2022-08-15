@@ -64,7 +64,6 @@ function parseLocals({options, node}, optionLocals, attributeLocals) {
  function readFile(options, href) {
   let roots = Array.from(options.roots).reverse();
   var filePath = isCorrectFilePath(roots,href);
-  console.log(filePath);
     return new Promise((resolve, reject) => {
       let roots = Array.from(options.roots).reverse();
       var filePath = isCorrectFilePath(roots,href);
