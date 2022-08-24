@@ -67,6 +67,9 @@ function parseLocals({options, node}, optionLocals, attributeLocals) {
     return new Promise((resolve, reject) => {
       let roots = Array.from(options.roots).reverse();
       var filePath = isCorrectFilePath(roots,href);
+      if (filePath === '') {
+        console.log("\n !! FILE NOT FOUND: " + href + " !! \n");
+      }
       fs.readFile(filePath, 'utf8', (error, response) => error ? reject(error) : resolve(response));
     });
 }
