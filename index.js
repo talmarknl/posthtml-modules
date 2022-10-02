@@ -4,8 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const isJSON = require('is-json');
 const posthtml = require('posthtml');
-const {merge, isEmpty} = require('lodash');
-const {render} = require('posthtml-render');
+const { merge, isEmpty } = require('lodash');
+const { render } = require('posthtml-render');
 const match = require('posthtml-match-helper');
 const expressions = require('posthtml-expressions');
 
@@ -18,7 +18,7 @@ const expressions = require('posthtml-expressions');
 function processNodeContentWithPosthtml(node, options) {
   return function (content) {
     return processWithPostHtml(options.parser, options.plugins, path.join(path.dirname(options.from), node.attrs[options.attribute]), content, [
-      parseLocals({options, node}, options.locals, node.attrs.locals)
+      parseLocals({ options, node }, options.locals, node.attrs.locals)
     ]);
   };
 }
@@ -28,29 +28,32 @@ function processNodeContentWithPosthtml(node, options) {
  * @param   {String}    locals  [string to parse as locals object]
  * @return  {Function}          [Function containing evaluated locals, or empty object]
  */
-function parseLocals({options, node}, optionLocals, attributeLocals) {
-  const attrLocals = options.attributeAsLocals ? {...node.attrs} : {};
+function parseLocals({ options, node }, optionLocals, attributeLocals) {
+  const attrLocals = options.attributeAsLocals ? { ...node.attrs } : {};
   if (options.attributeAsLocals) {
     delete attrLocals.href;
     delete attrLocals.locals;
   }
 
   try {
-    const locals = merge({...optionLocals}, {...attrLocals}, JSON.parse(attributeLocals));
-    return expressions({...options.expressions, locals});
+    const locals = merge({ ...optionLocals }, { ...attrLocals }, JSON.parse(attributeLocals));
+    return expressions({ ...options.expressions, locals });
   } catch {
-    const locals = merge({...optionLocals}, {...attrLocals});
+    const locals = merge({ ...optionLocals }, { ...attrLocals });
 
-    return expressions({...options.expressions, locals});
+    return expressions({ ...options.expressions, locals });
   }
 }
 
- function isCorrectFilePath(roots, href) {
+function isCorrectFilePath(roots, href) {
   for (let root of roots) {
     var filePath = path.join(path.isAbsolute(href) ? root : path.dirname(options.from), href);
+    if (filePath.includes('.html') == false) {
+      filePath = filePath + '.html';
+    }
     if (fs.existsSync(filePath)) {
-        return filePath;
-    } 
+      return filePath;
+    }
   }
   return '';
 }
@@ -61,17 +64,17 @@ function parseLocals({options, node}, optionLocals, attributeLocals) {
 * @param  {String} href     [node's href attribute value]
 * @return {Promise<String>} [Promise with file content's]
 */
- function readFile(options, href) {
+function readFile(options, href) {
   let roots = Array.from(options.roots).reverse();
-  var filePath = isCorrectFilePath(roots,href);
-    return new Promise((resolve, reject) => {
-      let roots = Array.from(options.roots).reverse();
-      var filePath = isCorrectFilePath(roots,href);
-      if (filePath === '') {
-        console.log("\n !! FILE NOT FOUND: " + href + " !! \n");
-      }
-      fs.readFile(filePath, 'utf8', (error, response) => error ? reject(error) : resolve(response));
-    });
+  var filePath = isCorrectFilePath(roots, href);
+  return new Promise((resolve, reject) => {
+    let roots = Array.from(options.roots).reverse();
+    var filePath = isCorrectFilePath(roots, href);
+    if (filePath === '') {
+      console.log("\n !! FILE NOT FOUND: " + href + " !! \n");
+    }
+    fs.readFile(filePath, 'utf8', (error, response) => error ? reject(error) : resolve(response));
+  });
 }
 
 /**
@@ -99,15 +102,15 @@ function parse(options) {
                 node.attrs &&
                 isJSON(node.attrs.locals)
               ) {
-                return parseLocals({options, node}, options.locals, node.attrs.locals)(node.content);
+                return parseLocals({ options, node }, options.locals, node.attrs.locals)(node.content);
               }
 
               if (node.content && node.attrs && options.attributeAsLocals) {
-                return parseLocals({options, node}, options.locals, {})(node.content);
+                return parseLocals({ options, node }, options.locals, {})(node.content);
               }
 
               if (node.content && !isEmpty(options.locals)) {
-                return parseLocals({options, node}, options.locals)(node.content);
+                return parseLocals({ options, node }, options.locals)(node.content);
               }
 
               return node.content || '';
