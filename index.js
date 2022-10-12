@@ -49,6 +49,9 @@ function isCorrectFilePath(roots, href) {
   for (let root of roots) {
     var filePath = path.join(path.isAbsolute(href) ? root : path.dirname(options.from), href);
     if (filePath.includes('.html') == false) {
+      if (fs.existsSync(filePath + '/default.html')) {
+        return filePath + '/default.html';
+      }
       filePath = filePath + '.html';
     }
     if (fs.existsSync(filePath)) {
